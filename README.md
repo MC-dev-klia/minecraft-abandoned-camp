@@ -42,4 +42,5 @@ campVariant takes in the region coordinates then returns the exact variant name 
 hasSecretChest takes in a variant name then returns if the variant has a copper chest or not as a boolean
 
 
-Note this project uses the cubiomes library as a easy way to check biomes in libcubiomes.a file.
+
+**Note this project uses the cubiomes library as a easy way to check biomes in libcubiomes.a file.**
