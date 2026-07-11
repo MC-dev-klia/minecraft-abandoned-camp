@@ -1,21 +1,30 @@
 #ifndef CAMP_H
 #define CAMP_H
 
-#include <cstdint>
-#include <string>
-#include <utility>
+#include <stdint.h>
 
-struct result
+#ifdef __cplusplus
+#include <cstdbool>
+extern "C" {
+#else
+#include <stdbool.h>
+#endif
+
+typedef struct
 {
-    bool valid = false;
-    int x = 0;
-    int z = 0;
-};
+    bool valid;
+    int x;
+    int z;
+} result;
 
 void initCamp(uint64_t seed);
 result isCamp(int rx, int rz);
-std::pair<int, int> campPos(int rx, int rz);
-std::string campVariant(int rx, int rz);
-bool hasSecretChest(const std::string &variantName);
+result campPos(int rx, int rz);
+const char *campVariant(int rx, int rz);
+bool hasSecretChest(const char *variantName);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

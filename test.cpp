@@ -1,5 +1,8 @@
 #include "camp.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstdint>
 #include <cinttypes>
 
 int main(int argc, char **argv)
@@ -33,13 +36,13 @@ int main(int argc, char **argv)
             {
                 continue;
             }
-            const std::string variant = campVariant(rx, rz);
+            const char *variant = campVariant(rx, rz);
             std::printf("region(%d,%d) pos=(%d,%d) camp=%s secretChest=%s\n",
                         rx,
                         rz,
                         camp.x,
                         camp.z,
-                        variant.c_str(),
+                        variant,
                         hasSecretChest(variant) ? "yes" : "no");
         }
     }
