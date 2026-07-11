@@ -127,19 +127,19 @@ std::vector<TentEntry> makeTentPool(std::initializer_list<std::pair<const char *
 
 JavaRandom makeRegionRng(uint64_t worldSeed, int regX, int regZ, int32_t salt)
 {
-    uint64_t seed = static_cast<uint64_t>(regX) * 341873128712ULL;
-    seed += static_cast<uint64_t>(regZ) * 132897987541ULL;
-    seed += worldSeed + static_cast<uint64_t>(salt);
-    seed &= kMask48;
+    int64_t seed64 = static_cast<int64_t>(regX) * 341873128712LL;
+    seed64 += static_cast<int64_t>(regZ) * 132897987541LL;
+    seed64 += static_cast<int64_t>(worldSeed) + static_cast<int64_t>(salt);
+    uint64_t seed = static_cast<uint64_t>(seed64) & kMask48;
     return JavaRandom(seed);
 }
 
 JavaRandom makePlacementRng(uint64_t worldSeed, int chunkX, int chunkZ)
 {
     JavaRandom base(worldSeed);
-    const uint64_t a = static_cast<uint64_t>(chunkX) * base.nextLong();
-    const uint64_t c = static_cast<uint64_t>(chunkZ) * base.nextLong();
-    const uint64_t seed = (a ^ c ^ worldSeed) & kMask48;
+    int64_t a = static_cast<int64_t>(chunkX) * static_cast<int64_t>(base.nextLong());
+    int64_t c = static_cast<int64_t>(chunkZ) * static_cast<int64_t>(base.nextLong());
+    uint64_t seed = (static_cast<uint64_t>(a) ^ static_cast<uint64_t>(c) ^ worldSeed) & kMask48;
     return JavaRandom(seed);
 }
 
@@ -199,9 +199,9 @@ std::vector<std::string> makeCampVariantList(bool bedrock, const std::string &bi
 
 void shuffleCampVariants(std::vector<std::string> &variants, JavaRandom &rng)
 {
-    for (std::size_t i = variants.size(); i > 1; --i)
+    for (int i = static_cast<int>(variants.size()); i > 1; --i)
     {
-        const int index = rng.nextInt(static_cast<int>(i));
+        const int index = rng.nextInt(i);
         std::swap(variants[index], variants[i - 1]);
     }
 }
@@ -247,9 +247,10 @@ CampResult computeCampResult(uint64_t seed, int regX, int regZ, Generator &gener
     };
 
     JavaRandom placementRng = makePlacementRng(seed, chunkX, chunkZ);
+    const int rotation = placementRng.nextInt(4);
     const int structureIndex = placementRng.nextInt(static_cast<int>(basePool.size()));
     const auto &entry = basePool[structureIndex];
-    const auto offset = rotateOffset(entry.size, placementRng.nextInt(4));
+    const auto offset = rotateOffset(entry.size, rotation);
 
     const int x = ((chunkX * 16 + chunkX * 16 + offset[0]) / 2) | 0;
     const int z = ((chunkZ * 16 + chunkZ * 16 + offset[2]) / 2) | 0;
@@ -277,11 +278,36 @@ CampResult computeCampResult(uint64_t seed, int regX, int regZ, Generator &gener
         shuffleCampVariants(variants, placementRng);
         result.campType = variants.front();
         const std::unordered_set<std::string> secretChestVariants = {
+            "campsite_default_chest_6",
+            "campsite_default_chest_7",
+            "campsite_default_chest_8",
+            "campsite_default_chest_9",
+            "campsite_default_chest_10",
+            "campsite_default_barrel_11",
+            "campsite_default_barrel_12",
+            "campsite_default_barrel_13",
+            "campsite_default_barrel_14",
+            "campsite_default_barrel_15",
+            "campsite_default_special_1",
+            "campsite_default_special_6",
             "campsite_default_special_8",
+            "campsite_default_special_13",
+            "campsite_cherry_grove_3",
+            "campsite_dappled_forest_3",
+            "campsite_flower_forest_2",
+            "campsite_forest_3",
+            "campsite_meadow_3",
+            "campsite_old_growth_birch_forest_2",
+            "campsite_old_growth_pine_taiga_2",
+            "campsite_pale_garden_2",
+            "campsite_savanna_2",
+            "campsite_snowy_taiga_1",
             "campsite_sparse_jungle_2",
-            "campsite_birch_forest_1",
+            "campsite_swamp_2",
+            "campsite_windswept_forest_3",
+            "campsite_wooded_badlands_3",
         };
-        result.copperChest = secretChestVariants.count(result.campType) != 0 || result.tentName == "tent_cherry_grove_4";
+        result.copperChest = secretChestVariants.count(result.campType) != 0;
     }
     else
     {
