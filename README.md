@@ -1,6 +1,6 @@
 # How to use
 
-Anyone may use these files as a reference to find abandonned camp structures. Please leave credit to this library if you decide to use the files. This library works both in c++ and C language.
+Anyone may use these files as a reference to find abandoned camp structures. Please leave credit to this library if you decide to use the files. This library works both in c++ and C language.
 
 # Using code as reference
 
